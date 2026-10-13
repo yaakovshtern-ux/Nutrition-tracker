@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10251d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Greenplate">
+  <meta name="description" content="A private, offline-first meal and nutrition tracker.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Greenplate — Nutrition</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">✳</div>
+      <div class="brand-copy"><div class="eyebrow">YOUR DAILY LOG</div><div class="brand-name">greenplate</div></div>
+      <div class="offline-pill"><span class="status-dot"></span><span id="connection-label">Ready offline</span></div>
+    </header>
+
+    <main>
+      <section class="view active" id="view-today">
+        <div class="page-heading">
+          <div><p class="eyebrow" id="today-label">YOUR DAY</p><h1>Nutrition overview</h1></div>
+          <button class="icon-button" id="go-today" aria-label="Go to today" title="Go to today">↺</button>
+        </div>
+        <div class="date-strip">
+          <button class="quiet-button" id="prev-day" aria-label="Previous day">‹</button>
+          <input id="selected-date" type="date" aria-label="Selected date">
+          <button class="quiet-button" id="next-day" aria-label="Next day">›</button>
+        </div>
+
+        <section class="calorie-card">
+          <div class="card-topline"><span>CALORIES</span><span id="calorie-percent">0% of goal</span></div>
+          <div class="calorie-main"><strong id="calorie-total">0</strong><span>kcal eaten</span></div>
+          <div class="progress-track"><div id="calorie-progress" class="progress-fill"></div></div>
+          <div class="card-foot"><span id="calorie-remaining">2,000 kcal remaining</span><button class="text-button light" id="edit-goals">Edit goals ↗</button></div>
+        </section>
+
+        <section class="macro-grid" aria-label="Macronutrients">
+          <article class="macro-card"><div class="macro-heading"><span class="macro-dot protein"></span>Protein</div><div><strong id="protein-total">0</strong><span> g</span></div><div class="mini-track"><div id="protein-progress" class="mini-fill protein-fill"></div></div><div class="macro-foot"><span id="protein-goal">Goal 140 g</span><span id="protein-pct">0%</span></div></article>
+          <article class="macro-card"><div class="macro-heading"><span class="macro-dot carbs"></span>Carbs</div><div><strong id="carbs-total">0</strong><span> g</span></div><div class="mini-track"><div id="carbs-progress" class="mini-fill carbs-fill"></div></div><div class="macro-foot"><span id="carbs-goal">Goal 220 g</span><span id="carbs-pct">0%</span></div></article>
+          <article class="macro-card"><div class="macro-heading"><span class="macro-dot fat"></span>Fat</div><div><strong id="fat-total">0</strong><span> g</span></div><div class="mini-track"><div id="fat-progress" class="mini-fill fat-fill"></div></div><div class="macro-foot"><span id="fat-goal">Goal 65 g</span><span id="fat-pct">0%</span></div></article>
+        </section>
+
+        <div class="section-heading"><div><p class="eyebrow">FUEL FOR YOUR DAY</p><h2>Meals</h2></div><button class="primary-button compact" id="add-first-meal">＋ Add food</button></div>
+        <div id="meal-list" class="meal-list"></div>
+        <div class="empty-state hidden" id="empty-meals"><div class="empty-icon">＋</div><h3>Start with your first meal</h3><p>Search the food library or add a custom food with your own nutrition values.</p><button class="primary-button" id="empty-add">Add a food</button></div>
+        <p class="small-note">Nutrition values are estimates. Your entries are stored on this device.</p>
+      </section>
+
+      <section class="view" id="view-foods">
+        <div class="page-heading"><div><p class="eyebrow">YOUR FOOD LIBRARY</p><h1>Foods</h1></div><button class="primary-button compact" id="add-custom-food">＋ Custom</button></div>
+        <label class="search-wrap"><span>⌕</span><input id="food-search" type="search" placeholder="Search foods, e.g. oats" autocomplete="off"></label>
+        <div class="filter-row"><span id="food-count">Starter foods</span><button class="text-button" id="show-all-foods">Show all</button></div>
+        <div id="food-results" class="food-results"></div>
+        <p class="small-note">Library values are typical estimates per 100 g. Add your own foods for package-specific values.</p>
+      </section>
+
+      <section class="view" id="view-history">
+        <div class="page-heading"><div><p class="eyebrow">LOOKING BACK</p><h1>History</h1></div></div>
+        <div class="history-summary"><span class="history-icon">↗</span><div><strong>Build consistency, not perfection.</strong><p>Your recent logged days, stored locally.</p></div></div>
+        <div id="history-list" class="history-list"></div>
+      </section>
+
+      <section class="view" id="view-settings">
+        <div class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>Settings & data</h1></div></div>
+        <section class="settings-card">
+          <div class="settings-title"><span class="settings-icon">◎</span><div><h2>Daily goals</h2><p>Set targets that work for you.</p></div></div>
+          <form id="goals-form" class="goals-form">
+            <label>Calories <span>kcal/day</span><input type="number" id="goal-calories" min="0" max="20000" step="50" required></label>
+            <label>Protein <span>g/day</span><input type="number" id="goal-protein" min="0" max="1000" step="5" required></label>
+            <label>Carbs <span>g/day</span><input type="number" id="goal-carbs" min="0" max="2000" step="5" required></label>
+            <label>Fat <span>g/day</span><input type="number" id="goal-fat" min="0" max="1000" step="5" required></label>
+            <button class="primary-button full-width" type="submit">Save daily goals</button>
+          </form>
+        </section>
+        <section class="settings-card">
+          <div class="settings-title"><span class="settings-icon">⇅</span><div><h2>Backup & restore</h2><p>Keep a copy of your foods, meals, and goals.</p></div></div>
+          <button class="secondary-button full-width" id="export-data">Export backup (.json)</button>
+          <label class="secondary-button full-width import-label">Import backup (.json)<input id="import-file" type="file" accept="application/json,.json"></label>
+          <p class="small-note">Import merges your backup into this device. Export regularly before clearing browser data or changing phones.</p>
+        </section>
+        <section class="settings-card about-card">
+          <h2>Offline by design</h2><p>The app shell is cached for offline use. Meals, foods, and goals live in this browser's local database. No account or server is required for daily logging.</p>
+          <div class="about-status"><span class="status-dot"></span><span id="storage-status">Local database ready</span></div>
+          <button class="danger-button" id="clear-data">Clear all local data</button>
+        </section>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Main navigation">
+      <button class="tab active" data-view="today"><span>◷</span><small>Today</small></button>
+      <button class="tab" data-view="foods"><span>⌕</span><small>Foods</small></button>
+      <button class="tab" data-view="history"><span>▤</span><small>History</small></button>
+      <button class="tab" data-view="settings"><span>⚙</span><small>Settings</small></button>
+    </nav>
+  </div>
+
+  <dialog id="food-dialog" class="sheet-dialog">
+    <form id="food-form" method="dialog">
+      <div class="sheet-handle"></div>
+      <div class="modal-heading"><div><p class="eyebrow" id="food-dialog-kicker">ADD TO MEAL</p><h2 id="food-dialog-title">Choose a food</h2></div><button type="button" class="close-button" data-close="food-dialog" aria-label="Close">×</button></div>
+      <div id="food-picker-step">
+        <label class="search-wrap modal-search"><span>⌕</span><input id="picker-search" type="search" placeholder="Search food library"></label>
+        <div class="meal-type-row"><label>Meal<select id="entry-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label></div>
+        <div id="picker-results" class="picker-results"></div>
+        <button type="button" class="secondary-button full-width" id="create-food-from-picker">＋ Create a custom food</button>
+      </div>
+      <div id="food-portion-step" class="hidden">
+        <div class="selected-food" id="selected-food-summary"></div>
+        <label class="field-label">Amount in grams<input id="portion-grams" type="number" min="0.1" max="10000" step="1" value="100" required></label>
+        <div class="nutrition-preview" id="portion-preview"></div>
+        <label class="field-label">Meal<select id="portion-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label>
+        <div class="button-row"><button type="button" class="secondary-button" id="portion-back">Back</button><button type="submit" class="primary-button" id="save-entry">Add to diary</button></div>
+      </div>
+      <div id="custom-food-step" class="hidden">
+        <p class="form-help">Enter nutrition values for 100 g of food. You can use package values and adjust the serving amount when logging it.</p>
+        <label class="field-label">Food name<input id="custom-name" maxlength="80" required placeholder="e.g. My granola"></label>
+        <div class="form-grid">
+          <label class="field-label">Calories (kcal)<input id="custom-calories" type="number" min="0" step="0.1" required value="0"></label>
+          <label class="field-label">Protein (g)<input id="custom-protein" type="number" min="0" step="0.1" required value="0"></label>
+          <label class="field-label">Carbs (g)<input id="custom-carbs" type="number" min="0" step="0.1" required value="0"></label>
+          <label class="field-label">Fat (g)<input id="custom-fat" type="number" min="0" step="0.1" required value="0"></label>
+        </div>
+        <div class="button-row"><button type="button" class="secondary-button" id="custom-cancel">Cancel</button><button type="button" class="primary-button" id="save-custom-food">Save food</button></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="edit-entry-dialog" class="sheet-dialog">
+    <form id="edit-entry-form" method="dialog">
+      <div class="sheet-handle"></div><div class="modal-heading"><div><p class="eyebrow">EDIT DIARY ENTRY</p><h2 id="edit-entry-title">Edit food</h2></div><button type="button" class="close-button" data-close="edit-entry-dialog" aria-label="Close">×</button></div>
+      <input type="hidden" id="edit-entry-id">
+      <label class="field-label">Amount in grams<input id="edit-entry-grams" type="number" min="0.1" max="10000" step="1" required></label>
+      <label class="field-label">Meal<select id="edit-entry-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></label>
+      <div class="button-row"><button type="button" class="danger-button" id="delete-entry">Delete</button><button type="submit" class="primary-button">Save changes</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
